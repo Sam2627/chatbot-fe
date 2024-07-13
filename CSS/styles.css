@@ -41,7 +41,7 @@ nav ul li a {
   background-color: #f4f4f4;
   text-align: center;
   padding: 2em 1em;
-  position: relative; /* Add this line */
+  position: relative; 
 }
 
 .chat-container {
@@ -103,13 +103,18 @@ footer {
 
 /* Button Styles */
 #askUsButton {
-  background-color: #4b0082;
-  color: white;
-  border: none;
-  padding: 1em 2em;
-  font-size: 1em;
-  border-radius: 5px;
-  cursor: pointer;
+  background-color: #4b0082; 
+  border: none; 
+  color: white; 
+  padding: 15px 32px; 
+  text-align: center; 
+  text-decoration: none; 
+  display: inline-block; 
+  font-size: 16px; 
+  margin: 4px 2px; 
+  cursor: pointer; 
+  border-radius: 12px; 
+  transition-duration: 0.4s; 
 }
 
 #askUsButton:hover {
@@ -323,3 +328,54 @@ footer {
   cursor: pointer;
 }
 
+
+.login-button {
+  background-color: #4b0082; 
+  border: none; 
+  color: white; 
+  padding: 15px 32px; 
+  text-align: center; 
+  text-decoration: none; 
+  display: inline-block; 
+  font-size: 16px; 
+  margin: 4px 2px; 
+  cursor: pointer; 
+  border-radius: 12px; 
+  transition-duration: 0.4s; 
+}
+
+.login-button:hover {
+  background-color: #0033aa;
+
+}
+
+@media (max-width: 480px) {
+  .container {
+      flex-direction: column;
+      text-align: center;
+  }
+
+  .text h2 {
+      font-size: 14px;
+  }
+
+  button {
+      font-size: 12px;
+      padding: 6px 12px;
+  }
+
+  #chatInputContainer input {
+      padding: 6px;
+  }
+
+  #chatInputContainer button {
+      padding: 6px;
+  }
+}
+
+/* Media query to hide the footer on screens narrower than 768px */
+@media (max-width: 768px) {
+  footer {
+      display: none;
+  }
+}

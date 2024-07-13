@@ -9,10 +9,66 @@ document.addEventListener('DOMContentLoaded', () => {
   const uncategorizedTab = document.getElementById('uncategorizedTab');
   const categorizedTab = document.getElementById('categorizedTab');
   const updateButton = document.getElementById('updateButton');
+  const logoutButton = document.getElementById('logoutButton');
 
   let allQuestionsData = []; 
   let allCategories = []; 
   let allTopics = []; 
+
+  // Function to verify JWT token
+  const verifyToken = async () => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      try {
+        const response = await  fetch(`${config.apiUrl}/api/verify-token`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ token: token }),
+          credentials: 'include' 
+        });
+
+        if (!response.ok) {
+          throw new Error(`Token verification failed: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log(data.message); // Token is valid
+      } catch (error) {
+        console.error("Token verification error:", error);
+        localStorage.removeItem('authToken');
+        window.location.href = '/login.html'; // Redirect to login if token is invalid
+      }
+    } else {
+      console.log("No token found. Redirecting to login.");
+      window.location.href = '/login.html';
+    }
+  };
+
+  // Call verifyToken on page load
+  verifyToken();
+
+  logoutButton.addEventListener('click', () => {
+    localStorage.removeItem('authToken'); 
+    fetch(`${config.apiUrl}/api/logout`, {
+      method: 'POST', 
+      credentials: 'include' // Include credentials
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Logout failed: ${response.status}`);
+      }
+      return response.json(); 
+    })
+    .then(data => {
+      console.log(data.message); 
+      window.location.href = '/login.html'; 
+    })
+    .catch(error => {
+      console.error("Logout error:", error);
+      alert("Logout failed. Please try again later."); 
+    });
+  });
 
   const loadCategories = async () => {
     try {
@@ -295,7 +351,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // Event Listener for "Quản lý câu hỏi" Link
   manageQuestionsLink.addEventListener('click', (event) => {
     event.preventDefault();
     searchInput.value = '';
@@ -306,7 +361,6 @@ document.addEventListener('DOMContentLoaded', () => {
     categorizedTab.classList.remove('active');
   });
 
-  // Event Listeners for Tabs
   uncategorizedTab.addEventListener('click', () => {
     loadCauHoi();
     uncategorizedTab.classList.add('active');

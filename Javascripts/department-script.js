@@ -5,15 +5,66 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('searchInput');
     const searchButton = document.getElementById('searchButton');
     const clearSearchButton = document.getElementById('clearSearchButton');
-    // const departmentSelect = document.getElementById('departmentSelected');
     const manageQuestionsLink = document.querySelector('.sidebar a');
  
 
     let allQuestionsData = [];
     let allCategories = [];
-    let allTopics = [];
-    let currentEditingRow = null; 
+  
+   // Function to verify JWT token
+   const verifyToken = async () => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      try {
+        const response = await  fetch(`${config.apiUrl}/api/verify-token`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ token: token }),
+          credentials: 'include' 
+        });
 
+        if (!response.ok) {
+          throw new Error(`Token verification failed: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log(data.message); // Token is valid
+      } catch (error) {
+        console.error("Token verification error:", error);
+        localStorage.removeItem('authToken');
+        window.location.href = '/login.html'; // Redirect to login if token is invalid
+      }
+    } else {
+      console.log("No token found. Redirecting to login.");
+      window.location.href = '/login.html';
+    }
+  };
+
+  // Call verifyToken on page load
+  verifyToken();
+
+  logoutButton.addEventListener('click', () => {
+    localStorage.removeItem('authToken'); 
+    fetch(`${config.apiUrl}/api/logout`, {
+      method: 'POST', 
+      credentials: 'include' // Include credentials
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Logout failed: ${response.status}`);
+      }
+      return response.json(); 
+    })
+    .then(data => {
+      console.log(data.message); 
+      window.location.href = '/login.html'; 
+    })
+    .catch(error => {
+      console.error("Logout error:", error);
+      alert("Logout failed. Please try again later."); 
+    });
+  });
 
     const loadCategories = async () => {
       try {
@@ -388,7 +439,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-//tab
    uncategorizedTab.addEventListener('click', () => {
     uncategorizedTab.classList.add('active');
     categorizedTab.classList.remove('active');
@@ -450,46 +500,6 @@ document.addEventListener('DOMContentLoaded', () => {
     searchInput.value = '';
     displayQuestions(allQuestionsData); 
   });
-
-  // const populateDepartmentDropdown = (departments) => {
-  // departmentSelect.innerHTML = ''; 
-  // departmentSelect.innerHTML = '<option value="">-- Chọn bộ phận --</option>'; 
-
-  // departments.forEach(department => {
-  // const option = document.createElement('option');
-  // option.value = department.MaDonVi;
-  // option.text = department.TenDonVi;
-  // departmentSelect.add(option);
-  // });
-  // };
-
-  // const applyFilters = () => {
-  // const searchTerm = searchInput.value.toLowerCase();
-  // const selectedDepartment = departmentSelect.value; 
-
-  // const filteredQuestions = allQuestionsData.filter(question => {
-  // const matchesSearch = question.CauHoi.toLowerCase().includes(searchTerm);
-  // const matchesDepartment = !selectedDepartment || question.MaDonVi === selectedDepartment;
-  // return matchesSearch && matchesDepartment; 
-  // });
-
-  // displayQuestions(filteredQuestions);
-  // };
-
-  // searchButton.addEventListener('click', applyFilters); 
-
-  // searchInput.addEventListener('keydown', (event) => {
-  //   if (event.key === "Enter" || event.keyCode === 13) {
-  //     applyFilters();
-  //   }
-  // });
-
-  // clearSearchButton.addEventListener('click', () => {
-  //   searchInput.value = ''; 
-  //   applyFilters();         
-  // });
-
-  // departmentSelect.addEventListener('change', applyFilters); 
    
   manageQuestionsLink.addEventListener('click', (event) => {
     event.preventDefault();

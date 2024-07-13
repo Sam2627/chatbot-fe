@@ -9,11 +9,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body>
-  <header> <div class="container">
+  <header>
+    <div class="container">
         <img src="img/Logo_Đại_học_Y_Dược_Cần_Thơ.gif" alt="Logo" class="logo">
         <span class="text"><h2>Trường Đại Học Y Dược Cần Thơ - Phòng Công Tác Sinh Viên</h2></span>
+        <button id="logoutButton">Đăng Xuất</button>
     </div>
-  </header> <div class="container">
+  </header>
+  
+  <div class="container">
     <div class="sidebar">
       <h3>Trang Chủ</h3>
       <a href="#" id="manageQuestionsLink">Quản lý câu hỏi</a> 
@@ -22,6 +26,7 @@
         <button id="categorizedTab">Đã chuyển</button>
       </div>
     </div>
+    
     <div class="content">
       <div class="search-bar">
         <input type="text" id="searchInput" placeholder="Tìm kiếm...">
@@ -29,6 +34,7 @@
         <button id="clearSearchButton">Làm rỗng</button>
         <button id="updateButton">Cập nhật câu trả lời</button>
       </div>
+      
       <table>
         <thead>
           <tr>
@@ -41,6 +47,7 @@
           </tr>
         </thead>
         <tbody>
+          <!-- Table body content goes here -->
         </tbody>        
       </table>
     </div>

@@ -10,7 +10,69 @@ document.addEventListener('DOMContentLoaded', () => {
   const similarQuestionsContainer = document.getElementById('similarQuestions');
   const similarQuestionsList = document.getElementById('similarQuestionsList');
   const clearSimilarQuestionsButton = document.getElementById('clearSimilarQuestionsButton');
-//   let hasUserSentQuestion = false;
+  const loginButton = document.getElementById('loginButton');
+
+document.getElementById('loginButton').addEventListener('click', () => {
+  window.location.href = 'login.html';
+});
+
+// Function to check if the user is logged in using JWT token
+function checkLoginStatus() {
+    const authToken = localStorage.getItem('authToken');
+    if (!authToken) {
+      // No JWT token found, user is not logged in
+      loginButton.textContent = 'Đăng Nhập';
+      loginButton.onclick = () => window.location.href = 'login.html';
+      return;
+    }
+    // Verify the JWT token on the server side
+    fetch(`${config.apiUrl}/api/verify-token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ token: authToken }),
+      credentials: 'include' 
+    })
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Token verification failed');
+      }
+    })
+    .then(() => {
+      // Token is valid, update UI accordingly
+      loginButton.textContent = 'Đăng Xuất';
+      loginButton.onclick = handleLogout;
+    })
+    .catch(error => {
+      console.error('Error checking login status:', error);
+      loginButton.textContent = 'Đăng Nhập';
+      loginButton.onclick = () => window.location.href = 'login.html';
+    });
+  }
+  
+  // Function to handle logout
+  function handleLogout() {
+    localStorage.removeItem('authToken'); // Clear JWT token from localStorage
+    fetch(`${config.apiUrl}/api/logout`, {
+      method: 'POST',
+      credentials: 'include' // Include credentials
+    })
+    .then(response => {
+      if (response.ok) {
+        window.location.href = '/login.html';
+      } else {
+        console.error('Error logging out:', response);
+      }
+    })
+    .catch(error => console.error('Logout error:', error));
+  }
+  
+  // Check login status on page load
+  checkLoginStatus();
+  
 
   askUsButton.addEventListener('click', () => {
       chatBox.classList.toggle('hidden');
@@ -26,6 +88,11 @@ document.addEventListener('DOMContentLoaded', () => {
           sendMessage();
       }
   });
+
+  function AutoScroll() {
+    var element = document.getElementById("chatBody");
+    element.scrollTop += 500;
+  }
 
   async function sendMessage() {
       const userInput = chatInput.value.trim();
@@ -64,9 +131,8 @@ document.addEventListener('DOMContentLoaded', () => {
           `;
           chatBody.innerHTML += chatbotMessage;
           addFeedbackButtonListeners();
-
           displaySimilarQuestions(data.Suggestions, userInput);
-          chatBody.scrollTop = chatBody.scrollHeight;
+          AutoScroll();
         } catch (error) {
             console.error('Error:', error.message);
     
@@ -85,17 +151,18 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             chatBody.innerHTML += chatbotMessage;
             addFeedbackButtonListeners();
+            AutoScroll();
         }
     }
-
+    
   function displayMessage(message, isUser) {
       const chatbox = document.getElementById("chatbox");
       const messageDiv = document.createElement("div");
       messageDiv.className = isUser ? "userMessage" : "chatbotMessage";
       messageDiv.textContent = message;
       chatbox.appendChild(messageDiv);
-      chatBody.scrollTop = chatBody.scrollHeight;
-  }
+      AutoScroll();
+    }
 
   function displaySimilarQuestions(suggestions, userQuestion) {
       similarQuestionsContainer.classList.remove('hidden');
@@ -106,9 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
           listItem.addEventListener('click', () => {
               chatInput.value = question;
               sendMessage();
-              setTimeout(() => {
-                  chatBody.scrollTop = chatBody.scrollHeight;
-              }, 100); 
+              AutoScroll();
           });
           similarQuestionsList.appendChild(listItem);
       });
@@ -148,19 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Feedback sent:', button.classList.contains('like') ? 'like' : 'dislike');
   
   if (button.classList.contains('like')) {
-    try {
-      const response =  fetch(`${config.apiUrl}/api/cauhoiMLup`, { 
-        method: 'POST'
-      });
-      if (response.ok) {
-        console.log("Question added to CauHoiML successfully!");
-      } else {
-        console.error('Error adding question to CauHoiML:', response.status);
-      }
-    } catch (err) {
-      console.error('Error adding question to CauHoiML:', err);
-    } 
-    
+  
     similarQuestionsContainer.classList.add('hidden');
 
   } else if (button.classList.contains('dislike')) { 
@@ -233,8 +286,4 @@ document.addEventListener('DOMContentLoaded', () => {
       similarQuestionsContainer.classList.add('hidden');
       clearSimilarQuestionsButton.classList.add('hidden');
   });
-
-//   function containsKeywords(question, keywords) {
-//       return keywords.some(keyword => question.toLowerCase().includes(keyword.toLowerCase()));
-//   }
 });

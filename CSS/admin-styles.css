@@ -95,3 +95,23 @@ button.delete {
 .hidden-column {
     display: none;
 }
+
+#logoutButton {
+    background-color: #f44336; /* Red background */
+    color: white; /* White text */
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-top: 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    position: absolute;
+    right: 180px;
+}
+
+#logoutButton:hover {
+    background-color: #df372d; /* Darker red on hover */
+}
